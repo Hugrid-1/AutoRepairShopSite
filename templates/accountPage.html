@@ -170,10 +170,10 @@
 				<div id="responsive-nav" class="">
 					<!-- NAV -->
 					<ul class="main-nav nav navbar-nav">
-						<li><a href={{url_for('mainpage')}}>Главная</a></li>
-						<li><a href={{url_for('showContacts')}}>Контакты</a></li>
-						<li class="active"><a href={{url_for('showStampsList')}}>Каталог запчастей</a></li>
-						<li><a href={{url_for('showServiceList')}}>Услуги</a></li>
+						<li ><a href="home">Главная</a></li>
+						<li><a href="contacts">Контакты</a></li>
+						<li><a href="catalog">Каталог запчастей</a></li>
+						<li class="active"><a href="services">Услуги</a></li>
 					</ul>
 					<!-- /NAV -->
 				</div>
@@ -184,40 +184,15 @@
 		<div class="section">
 			<!-- container -->
 			<div class="container">
-				{% if viewmode == "stamp" %}
-				<h3>Выберите марку автомобиля</h3>
-					{% for stamp in data %}
-						<!-- row -->
-						<div class="row">
-							<a class="catalog-ref" href="catalog/{{stamp.id}}">{{stamp.stampName}}</a>
-						</div>
-					{% endfor %}
-				{% elif viewmode == "model" %}
-				<h3>Выберите модель автомобиля</h3>
-					{% for model in data %}
-						<!-- row -->
-						<div class="row">
-							<a class="catalog-ref" href="{{stampId}}/{{model.id}}">{{model.modelName}}</a>
-						</div>
-					{% endfor %}
-				{% elif viewmode == "autopart" %}
-				<h3>Запчасти в наличии</h3>
-					{% for autopart in data %}
-						<!-- row -->
-						<div class="row">
-							<a class="catalog-ref" href="#">{{autopart.autopartName}}</a>
-							<p>Цена {{autopart.price}}</p>
-						</div>
-					{% endfor %}
-				{% else %}
-				ERROR viewmode incorrect
-				{% endif %}
-
+				<!-- row -->
+				<div class="row">
+					<a href="#"> {{user_data}} </a>
+				</div>
 				<!-- /row -->
 			</div>
 			<!-- /container -->
 		</div>
-
+		<a href="logout">sada</a>
 		<!-- FOOTER -->
 		<footer id="footer">
 			<!-- top footer -->
