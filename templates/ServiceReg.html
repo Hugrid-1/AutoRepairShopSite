@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-		<title>Автомастерская</title>
+		<title>Запись на услугу</title>
 
 		<!-- Google font -->
 		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
@@ -170,11 +170,10 @@
 				<div id="responsive-nav" class="">
 					<!-- NAV -->
 					<ul class="main-nav nav navbar-nav">
-						<li ><a href="home">Главная</a></li>
-						<li><a href="contacts">Контакты</a></li>
+						<li><a href="home">Главная</a></li>
+						<li ><a href="contacts">Контакты</a></li>
 						<li><a href="catalog">Каталог запчастей</a></li>
 						<li class="active"><a href="services">Услуги</a></li>
-						<li class="active"><a href="{url_for('profile')}">Профиль</a></li>
 					</ul>
 					<!-- /NAV -->
 				</div>
@@ -187,13 +186,20 @@
 			<div class="container">
 				<!-- row -->
 				<div class="row">
-					<a href="#"> {{user_data}} </a>
+					<form class="d-flex justify-content-center flex-column" method="POST">
+					  	<h1>Запись на услугу</h1>
+						<p>Услуга - <bold>{{service.serviceName}}</bold></p>
+						<p>Стоимость услуги - <bold>{{service.price}} руб.</bold></p>
+						<p>Выберите дату оказания услуги</p>
+						<input type="date" id="start"   value="{{todayDate}}" min="{{todayDate}}" max="2022-12-31" name="dateService" title="dateService"><br>
+						<button class="btn btn-primary bg-success" type="submit">Записаться</button>
+					</form>
 				</div>
 				<!-- /row -->
 			</div>
 			<!-- /container -->
 		</div>
-		<a href="logout">Выйти из аккаунта</a>
+
 		<!-- FOOTER -->
 		<footer id="footer">
 			<!-- top footer -->
@@ -218,11 +224,10 @@
 							<div class="footer">
 								<h3 class="footer-title">Categories</h3>
 								<ul class="footer-links">
-									<li><a href="#">Hot deals</a></li>
-									<li><a href="#">Laptops</a></li>
-									<li><a href="#">Smartphones</a></li>
-									<li><a href="#">Cameras</a></li>
-									<li><a href="#">Accessories</a></li>
+									<li><a href="home">Главная</a></li>
+									<li class="active"><a href="contacts">Контакты</a></li>
+									<li><a href="catalog">Каталог запчастей</a></li>
+									<li><a href="services">Услуги</a></li>
 								</ul>
 							</div>
 						</div>

@@ -1,17 +1,23 @@
+import datetime
+
 from flask import Flask, render_template, redirect, url_for, request
 from flask_login import UserMixin, login_user, logout_user
 from flask_login import login_required, current_user, LoginManager
 from sqlalchemy import create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask_sqlalchemy import SQLAlchemy
 db_string = "postgresql://vova:123@localhost/AutoRepairShop" #адрес подключения к БД
 
-db = create_engine(db_string) #создание класса базы данных
+
 
 
 app = Flask( __name__ ,static_folder='static',static_url_path='/static') #определение переменной приложения
-
+app.config['SQLALCHEMY_DATABASE_URI'] = db_string
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'CVN5M974M12fgXda315sczNMx778JKMnb32cv'
+
+dbEngine = create_engine(db_string) #создание класса базы данных
+dbApp = SQLAlchemy(app)
 
 login__manager = LoginManager(app)
 LoginManager.login_view = 'authorization'
@@ -19,25 +25,15 @@ LoginManager.login_message = "Авторизуйтесь для доступа �
 LoginManager.login_message_category = "success"
 
 ### Работа с БД #######
-#Получение пользоваталея по id
-def GetUser(id):
-    user = db.execute(f'SELECT * FROM "Users" WHERE id = {id} LIMIT 1').fetchone()
-    if not user:
-        print("Пользователь не найден")
-        return False
 
-class UserLogin(UserMixin):
-    def fromDB(self, user_id):
-        self.__user = GetUser(user_id)
-        return self
-
-    def create(self, user):
-        self.__user = user
-        return self
-
-    def get_id(self):
-        return str(self.__user['id'])
-
+class User(dbApp.Model,UserMixin):
+    __tablename__ = 'Users'
+    id = dbApp.Column(dbApp.Integer, primary_key=True)
+    login = dbApp.Column(dbApp.String(25), nullable=False)
+    email = dbApp.Column(dbApp.String(300), nullable=False)
+    password = dbApp.Column(dbApp.String(300), nullable=False)
+    fio = dbApp.Column(dbApp.String(1000), nullable=False)
+    telephone = dbApp.Column(dbApp.String(15), nullable=False)
 
 
 ########ОБРАБОТКА АДРЕСНЫХ ПУТЕЙ###########
@@ -46,17 +42,18 @@ class UserLogin(UserMixin):
 @app.route('/')
 @app.route('/home')
 def mainpage():
+    print()
     return render_template("index.html")
 
 #### ВЫВОД КАТАЛОГА АВТОЗАПЧАСТЕЙ ####
 @app.route('/catalog')
 def showStampsList():
-    data = db.execute('SELECT * FROM "Stamps"').fetchall()
+    data = dbEngine.execute('SELECT * FROM "Stamps"').fetchall()
     return render_template("catalog.html",data=data,viewmode="stamp")
 
 @app.route('/catalog/<stampId>')
 def showModelsList(stampId):
-    data = db.execute(f'SELECT * FROM "Models" WHERE "stampID" = {stampId}').fetchall()
+    data = dbEngine.execute(f'SELECT * FROM "Models" WHERE "stampID" = {stampId}').fetchall()
     return render_template("catalog.html",data=data,viewmode="model",stampId=stampId)
 
 @app.route('/catalog/<stampID>/<modelID>')
@@ -66,27 +63,46 @@ def redirectToAutoPartList(stampID,modelID):
 
 @app.route('/catalog-for-your-choice/<modelID>')
 def showAutoPartList(modelID):
-    data = db.execute(f'SELECT * FROM "Autoparts" WHERE id_model = {modelID}').fetchall()
+    data = dbEngine.execute(f'SELECT * FROM "Autoparts" WHERE id_model = {modelID}').fetchall()
 
     return render_template("catalog.html", data=data, viewmode="autopart", static='static')
 
 @app.route('/services')
 def showServiceList():
-    serviceList = db.execute('SELECT * FROM "Services"')
+    serviceList = dbEngine.execute('SELECT * FROM "Services"')
     return render_template("services.html",services=serviceList)
 
+@app.route('/serviceRegistration/<service_id>',methods=['GET','POST'])
+@login_required
+def addServiceRequest(service_id):
+    todayDate = datetime.date.today()
+    service = dbEngine.execute(f'SELECT * FROM "Services" WHERE id = {service_id}').fetchone()
+    if request.method == "POST":
+        print(request.form)
+        service_date = request.form['dateService']
+        user_id = current_user.get_id()
+        requestStatus = "Создан"
+        dbEngine.execute(f'INSERT INTO "ServiceRequests" (create_day, event_day, service_id, user_id, status) VALUES' + f"('{todayDate}', '{service_date}', {service_id},{user_id},'{requestStatus}')")
+
+    return render_template("ServiceReg.html",service=service,todayDate=todayDate)
+
+
+#страница с контактами
 @app.route('/contacts')
 def showContacts():
     return render_template("contact.html")
 
 ###### СИСТЕМА АВТОРИЗАЦИИ #######
+
+#страница с профилем пользователя
 @app.route('/profile')
 @login_required
 def showAccountInfo():
+    print(current_user.login,current_user.id,current_user.fio)
     #buy_history
     return render_template("accountPage.html",user_data=1)
 
-
+#Авторизация/Регистрация пользователя
 @app.route('/authorization',methods=['GET','POST'])
 def authorization():
     print(request.form)
@@ -102,7 +118,7 @@ def authorization():
             hash_pwd = generate_password_hash(password) #кодировка пароля
 
             if username and password and email and fio and telephone:
-                db.execute(f'INSERT INTO "Users" (login, email, fio, password, telephone) VALUES' + f"('{username}', '{email}', '{fio}','{hash_pwd}','{telephone}')")
+                dbEngine.execute(f'INSERT INTO "Users" (login, email, fio, password, telephone) VALUES' + f"('{username}', '{email}', '{fio}','{hash_pwd}','{telephone}')")
                 return redirect(request.args.get("next") or url_for("showAccountInfo"))
             else:
                 print("Заполнены не все поля")
@@ -110,12 +126,11 @@ def authorization():
             login = request.form["username"]
             password = request.form["password"]
             if login and password:
-                user = db.execute(f'SELECT * FROM "Users" WHERE "login" =' + f"'{login}'" +' LIMIT 1').fetchone()
+                user = User.query.filter_by(login=login).first()
                 print(user)
                 if user and check_password_hash(user.password, password):
-                    userlogin = UserLogin().create(user)
                     #rm = True if request.form.get('remainme') else False
-                    login_user(userlogin, remember=True)
+                    login_user(user, remember=True)
                     print(f"АВТОРИЗОВАН {current_user.get_id()}")
                     return redirect(request.args.get("next") or url_for("showAccountInfo"))
                 else:
@@ -124,18 +139,23 @@ def authorization():
                 pass #ПРОПИСАТЬ
     return render_template("authorization.html")
 
+#подгрузка пользователя
 @login__manager.user_loader
 def load_user(user_id):
     print("load_user")
-    return UserLogin().fromDB(user_id)
+    return User.query.get(user_id)
 
+#обработчик для перенаправления на авторизацию неавторизированного пользователя
 @login__manager.unauthorized_handler
 def unauthorized():
     return redirect("authorization")
 
+#выход из аккаунта
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('mainpage'))
+
+dbApp.create_all()
 app.run(debug=True) #запуск программы на локальном сервере
