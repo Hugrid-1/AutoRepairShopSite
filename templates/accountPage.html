@@ -229,7 +229,31 @@
 				<div class="row">
 					<h3>История покупок автозапчастей:</h3>
 				</div>
+				{% for sellRequest in userSellRequestList %}
+					<div class="row">
+						<div class="card mb-3 bg-info" style="max-width: 800px;">
+						  <div class="row g-0">
+							<div class="col-md-4">
+								<BR>
+								<bR>
+							  <h4 class="text-center card-title">Заказ</h4>
+							</div>
+							<div class="col-md-8 ">
+							  <div class="card-body">
+								<p class="card-text">Дата создания запроса - {{sellRequest.create_day}}</p>
+								<p class="card-text">Дата поставки - {{sellRequest.event_day}}</p>
+								  <p class="card-text">Общая стоимост - {{sellRequest.cart_price}} руб.</p>
+								  <p class="card-text">Статус - {{sellRequest.status}}</p>
+								<h5 class="card-text">ID : {{sellRequest.id}}</h5>
+							  </div>
 
+							</div>
+
+						  </div>
+						</div>
+					</div>
+				<br>
+				{% endfor %}
 				<!-- /row -->
 			</div>
 			<!-- /container -->

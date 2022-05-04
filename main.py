@@ -24,6 +24,7 @@ LoginManager.login_view = 'authorization'
 LoginManager.login_message = "Авторизуйтесь для доступа к закрытым страницам"
 LoginManager.login_message_category = "success"
 
+autopartCart = []
 ### Работа с БД #######
 
 class User(dbApp.Model,UserMixin):
@@ -49,23 +50,59 @@ def mainpage():
 @app.route('/catalog')
 def showStampsList():
     data = dbEngine.execute('SELECT * FROM "Stamps"').fetchall()
-    return render_template("catalog.html",data=data,viewmode="stamp")
+    return render_template("catalog.html",data=data,viewmode="stamp",autopartCart=autopartCart,cartLen=len(autopartCart))
 
 @app.route('/catalog/<stampId>')
 def showModelsList(stampId):
     data = dbEngine.execute(f'SELECT * FROM "Models" WHERE "stampID" = {stampId}').fetchall()
-    return render_template("catalog.html",data=data,viewmode="model",stampId=stampId)
+    return render_template("catalog.html",data=data,viewmode="model",stampId=stampId,autopartCart=autopartCart,cartLen=len(autopartCart))
 
 @app.route('/catalog/<stampID>/<modelID>')
 def redirectToAutoPartList(stampID,modelID):
-    return redirect(url_for('showAutoPartList',modelID=modelID))
+    return redirect(url_for('showAutoPartList',modelID=modelID,autopartCart=autopartCart,cartLen=len(autopartCart)))
     #return render_template("catalog.html", data=data, viewmode="autopart",stampId=stampId,static='static')
 
-@app.route('/catalog-for-your-choice/<modelID>')
+@app.route('/catalog-for-your-choice/<modelID>',methods=['GET','POST'])
 def showAutoPartList(modelID):
     data = dbEngine.execute(f'SELECT * FROM "Autoparts" WHERE id_model = {modelID}').fetchall()
+    if request.method == "POST":
+        if request.form['action'] == "addToCart":
+            autopart = get_autopart(request.form['autopart'])
+            autopartCart.append(autopart)
+            print("В корзину добавлена запчасть")
+            print(autopartCart)
+        if request.form['action'] == "removeFromCart":
+            autopart = get_autopart(request.form['autopart'])
+            print("Из корзины удалена запчасть")
+            autopartCart.remove(autopart)
+            print(autopartCart)
+    return render_template("catalog.html", data=data, viewmode="autopart", static='static',autopartCart=autopartCart,cartLen=len(autopartCart))
 
-    return render_template("catalog.html", data=data, viewmode="autopart", static='static')
+
+def get_autopart(autopartID):
+
+    autopart = dbEngine.execute(f'SELECT * FROM "Autoparts" WHERE id = {autopartID}').fetchone()
+    return autopart
+
+@app.route('/cart',methods=['GET','POST'])
+@login_required
+def cartPage():
+    todayDate = datetime.date.today()
+    cartPrice = 0
+    for autopart in autopartCart:
+        cartPrice += autopart.price
+    if request.method == "POST":
+        service_date = request.form['dateService']
+        user_id = current_user.get_id()
+        requestStatus = "Создан"
+        dbEngine.execute(f'INSERT INTO "SellRequests" (create_day, event_day, user_id, status, cart_price) VALUES' + f"('{todayDate}', '{service_date}', {user_id},'{requestStatus}',{cartPrice}) RETURNING id")
+        lastRow = dbEngine.execute('SELECT * FROM public."SellRequests"ORDER BY id DESC ')
+        request_id = lastRow.fetchone().id
+        for autopart in autopartCart:
+            dbEngine.execute(f'INSERT INTO "Sell_items" (request_id,autopart_id) VALUES' + f"('{request_id}', '{autopart.id}')")
+    return render_template("buy.html",autopartCart=autopartCart,cartLen=len(autopartCart),CartPrice=cartPrice)
+
+
 
 @app.route('/services')
 def showServiceList():
@@ -100,8 +137,9 @@ def showContacts():
 def showAccountInfo():
     print(current_user.login,current_user.id,current_user.fio)
     userServiceRequestList = dbEngine.execute(f'SELECT * FROM "UserServiceRequests"'+f" WHERE user_id = {current_user.id} ")
+    userSellRequestList =  dbEngine.execute(f'SELECT * FROM "SellRequests"'+f" WHERE user_id = {current_user.id} ")
     #buy_history
-    return render_template("accountPage.html",userServiceRequestList=userServiceRequestList)
+    return render_template("accountPage.html",userServiceRequestList=userServiceRequestList,userSellRequestList=userSellRequestList)
 
 #Авторизация/Регистрация пользователя
 @app.route('/authorization',methods=['GET','POST'])
