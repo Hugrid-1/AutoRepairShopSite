@@ -99,8 +99,9 @@ def showContacts():
 @login_required
 def showAccountInfo():
     print(current_user.login,current_user.id,current_user.fio)
+    userServiceRequestList = dbEngine.execute(f'SELECT * FROM "UserServiceRequests"'+f" WHERE user_id = {current_user.id} ")
     #buy_history
-    return render_template("accountPage.html",user_data=1)
+    return render_template("accountPage.html",userServiceRequestList=userServiceRequestList)
 
 #Авторизация/Регистрация пользователя
 @app.route('/authorization',methods=['GET','POST'])
