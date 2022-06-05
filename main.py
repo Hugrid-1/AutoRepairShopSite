@@ -39,11 +39,13 @@ def valid_password(password): # проверка пароля на коррек�
             return False
         alphaCounter = 0 #счетчик букв
         for i in password:
-            if i.isalpha() and alphaCounter <= 2:
-                alphaCounter += 1 #увеличение счетчика
-            elif alphaCounter >= 3:
-                checkStatus = True
-                return checkStatus #выход из цикла при наборе нужного количества букв
+            if i.isalpha():
+                alphaCounter += 1
+                if alphaCounter <= 2:
+                     continue           #увеличение счетчика
+                if alphaCounter >= 3:
+                    checkStatus = True
+                    return checkStatus  #выход из цикла при наборе нужного количества букв
         print("Символов недостаточно")
         return checkStatus
 
@@ -52,6 +54,9 @@ def valid_telephone_number(inp): #проверка номера телефона
     # if not all(inp[x] == "-" for x in [7]) and len(inp) == 12:
     #     return False
     # return inp.replace("-", "", 3).isdigit()
+    for i in inp:
+        if not i.isdigit():
+            return False
     return True
 
 def valid_fio(fio): #проверка корректности ФИО
@@ -195,6 +200,7 @@ def showAccountInfo():
 @app.route('/authorization',methods=['GET','POST'])
 def authorization():
     print(request.form)
+    panelStatus = ''
     if request.method =="POST":
         if request.form["checkForm"] == "registration":
             #получение данных из формы регистрации
@@ -210,18 +216,24 @@ def authorization():
             if username and password and email and fio and telephone:
                 if password != retry_password:
                     flash('Пароли не одинаковы')
+                    panelStatus = "right-panel-active"
                     # return render_template("authorization.html")
                 elif not valid_password(password):
                     flash('Пароль некорректен')
+                    panelStatus = "right-panel-active"
                     # return render_template("authorization.html")
                 elif not valid_fio(fio):
                     flash('ФИО некорректно')
+                    panelStatus = "right-panel-active"
                     # return render_template("authorization.html")
                 else:
                     dbEngine.execute(f'INSERT INTO "Users" (login, email, fio, password, telephone) VALUES' + f"('{username}', '{email}', '{fio}','{hash_pwd}','{telephone}')")
-                    return redirect(request.args.get("next") or url_for("showAccountInfo"))
+                    LoginText = "Вы успешно зарегистрировались. Войдите под своими данными"
+                    return render_template("authorization.html",panelStatus=panelStatus,LoginText=LoginText)
+
             else:
                 flash("Заполнены не все поля")
+                panelStatus = "right-panel-active"
         elif request.form["checkForm"] == "login":
             login = request.form["username"]
             password = request.form["password"]
@@ -237,7 +249,7 @@ def authorization():
                     print("[LOG ERROR] ПОЛЬЗОВАТЕЛЬ НЕ СУЩЕСТВУЕТ ЛИБО ПАРОЛЬ НЕВЕРНЫЙ")
             else:
                 pass #ПРОПИСАТЬ
-    return render_template("authorization.html")
+    return render_template("authorization.html",panelStatus=panelStatus)
 
 #подгрузка пользователя
 @login__manager.user_loader

@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<div class="container" id="container">
+<div class="container {{panelStatus}}" id="container">
 	<div class="form-container sign-up-container">
 		<form action="#" method="POST">
 			<h1>Регистрация</h1>
@@ -24,7 +24,7 @@
       {% if messages %}
         <ul class=flashes>
         {% for message in messages %}
-          <li>{{ message }}</li>
+          <li style="color:red">{{ message }}</li>
         {% endfor %}
         </ul>
       {% endif %}
@@ -39,6 +39,7 @@
 			<input type="password" name="password" placeholder="Пароль" />
 			<input type="hidden" name="checkForm" value="login">
 			<button >Войти</button>
+			<h5>{{LoginText}}</h5>
 		</form>
 	</div>
 	<div class="overlay-container">
