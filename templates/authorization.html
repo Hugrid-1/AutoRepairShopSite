@@ -14,18 +14,27 @@
 			<h1>Регистрация</h1>
 			<input type="text" name="username" placeholder="Имя пользователя" />
 			<input type="email" name="email" placeholder="Адрес электронной почты" />
-			<input type="password" name="password" placeholder="Пароль" />
+			<input type="password" name="password" placeholder="Пароль 6  символов мин. 3 буквы" />
 			<input type="password" name="retry_password" placeholder="Повторите пароль" />
 			<input type="text" name="fio" placeholder="ФИО" />
 			<input type="text" name="telephone" placeholder="Телефон" />
 			<input type="hidden" name="checkForm" value="registration">
+			<!--  Вывод критических сообщений  -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
 			<button>Зарегистрироваться</button>
 		</form>
 	</div>
 	<div class="form-container sign-in-container">
 		<form action="#" method="POST">
 			<h1>Вход</h1>
-			<span>or use your account</span>
 			<input type="text" name="username" placeholder="Имя пользователя" />
 			<input type="password" name="password" placeholder="Пароль" />
 			<input type="hidden" name="checkForm" value="login">
@@ -45,6 +54,16 @@
 				<button class="ghost" id="signUp" type="submit" name="submit_button" value="registration">Зарегистрироваться</button>
 			</div>
 		</div>
+		<!--  Вывод критических сообщений  -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
 	</div>
 </div>
 

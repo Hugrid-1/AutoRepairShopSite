@@ -4,9 +4,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
 		<title>Автомастерская</title>
-
 		<!-- Google font -->
 		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
 
@@ -117,18 +115,104 @@
 		<div class="section">
 			<!-- container -->
 			<div class="container">
+				<div class="row">
+					<img src="../static/img/02_lexus.png">
+				</div>
 				<!-- row -->
 				<div class="row">
+					<h3>Об автомастерской</h3>
+					<p>
+						Приветствуем Вас в специализированном автосервисе «Autorepair»!
+					Основное направление нашей деятельности – ремонт и обслуживание автомобилей с широким спектром моделей и марок авто.
+					Работы проводятся на профессиональном уровне мастерами, аттестованными у производителя и имеющими за плечами не один год работы в его официальных дилерских центрах.
+					Также сервис предоставляет услуги по продаже автозапчастей как в автосервисе так и при заказе онлайн на сайте!
+					</p>
+					<br>
+					<p>
+						При этом мы позаботимся не только об автомобиле, но и о его владельце!
+					В его распоряжении – удобная парковка, комфортабельная зона отдыха с кофе-машиной и высокоскоростной “Wi-Fi”.
+					Узнайте, что такое по-настоящему профессиональный сервис, обратившись к нам!
+					</p>
+
 				</div>
 				<!-- /row -->
 			</div>
 			<!-- /container -->
 		</div>
-		<div class="section">
-			<div class="row">
+		<section class="ftco-section">
+    	<div class="container">
+    		<div class="row justify-content-center pb-5 mb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
 
-			</div>
-		</div>
+            <h2>Наши услуги</h2>
+          </div>
+        </div>
+    		<div class="row">
+          <div class="col-md-4 services ftco-animate">
+            <div class="d-block d-flex">
+              <div class="icon d-flex justify-content-center align-items-center">
+            		<span class="flaticon-car-service"></span>
+              </div>
+              <div class="media-body pl-3">
+                <h3 class="heading">Мойка автомобиля</h3>
+                <p><a href="{{url_for('showServiceList')}}" class="btn-custom">Перейти на страницу услуг</a></p>
+              </div>
+            </div>
+            <div class="d-block d-flex">
+              <div class="icon d-flex justify-content-center align-items-center">
+            		<span class="flaticon-tyre"></span>
+              </div>
+              <div class="media-body pl-3">
+                <h3 class="heading">Шиномонтаж</h3>
+                <p><a href="{{url_for('showServiceList')}}" class="btn-custom">Перейти на страницу услуг</a></p>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-md-4 services ftco-animate">
+            <div class="d-block d-flex">
+              <div class="icon d-flex justify-content-center align-items-center">
+            		<span class="flaticon-battery"></span>
+              </div>
+              <div class="media-body pl-3">
+                <h3 class="heading">Компьютерная диагностика и ремонт электрооборудования</h3>
+                <p><a href="{{url_for('showServiceList')}}" class="btn-custom">Перейти на страницу услуг</a></p>
+              </div>
+            </div>
+            <div class="d-block d-flex">
+              <div class="icon d-flex justify-content-center align-items-center">
+            		<span class="flaticon-car-engine"></span>
+              </div>
+              <div class="media-body pl-3">
+                <h3 class="heading">Ремонт и заправка автокондиционеров</h3>
+                <p><a href="{{url_for('showServiceList')}}" class="btn-custom">Перейти на страницу услуг</a></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 services ftco-animate">
+            <div class="d-block d-flex">
+              <div class="icon d-flex justify-content-center align-items-center">
+            		<span class="flaticon-tow-truck"></span>
+              </div>
+              <div class="media-body pl-3">
+                <h3 class="heading">Замена масла</h3>
+                <p><a href="{{url_for('showServiceList')}}" class="btn-custom">Перейти на страницу услуг</a></p>
+              </div>
+            </div>
+            <div class="d-block d-flex">
+              <div class="icon d-flex justify-content-center align-items-center">
+            		<span class="flaticon-repair"></span>
+              </div>
+              <div class="media-body pl-3">
+                <h3 class="heading">Ремонт двигателя</h3>
+                <p><a href="{{url_for('showServiceList')}}" class="btn-custom">Перейти на страницу услуг</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+    	</div>
+    </section>
 		<!-- FOOTER -->
 		<footer id="footer">
 			<!-- top footer -->
